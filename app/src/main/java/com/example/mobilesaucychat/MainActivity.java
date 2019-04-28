@@ -43,7 +43,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        if(firebaseAuth.getCurrentUser()!=null){
+        if(firebaseAuth.getCurrentUser()!= null){
             startActivity(new Intent(getApplicationContext(), ChatRoomActivity.class));
         }
     }
