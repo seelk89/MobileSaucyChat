@@ -2,7 +2,7 @@ package com.example.mobilesaucychat.models;
 
 public class User {
     private long m_id;
-    private String m_username;
+    private String m_email;
     private String m_password;
     private double m_latLocation;
     private double m_lonLocation;
@@ -10,11 +10,11 @@ public class User {
     private String m_imageId;
 
     public User(
-            String username,
+            String email,
             String password,
             String displayName
     ) {
-        m_username = username;
+        m_email = email;
         m_password = password;
         m_displayName = displayName;
     }
@@ -27,12 +27,12 @@ public class User {
         m_id = id;
     }
 
-    public String getUsername() {
-        return m_username;
+    public String getEmail() {
+        return m_email;
     }
 
-    public void setuserName(String username) {
-        m_username = username;
+    public void setEmail(String email) {
+        m_email = email;
     }
 
     public String getPassword() {
