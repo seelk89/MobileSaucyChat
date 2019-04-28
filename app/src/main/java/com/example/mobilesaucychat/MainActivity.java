@@ -26,6 +26,9 @@ public class MainActivity extends AppCompatActivity {
 
         firebaseAuth = FirebaseAuth.getInstance();
 
+        etEmail = findViewById(R.id.etEmail);
+        etPassword = findViewById(R.id.etPassword);
+
         findViewById(R.id.btnSignIn).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -39,6 +42,10 @@ public class MainActivity extends AppCompatActivity {
                 onClickSignUpWithEmailAndPassword(etEmail.getText().toString(), etPassword.getText().toString());
             }
         });
+
+        if(firebaseAuth.getCurrentUser()!=null){
+            startActivity(new Intent(getApplicationContext(), ChatRoomActivity.class));
+        }
     }
 
     private void onClickSignIn() {
@@ -56,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(getApplicationContext(),"Please fill in the required password field",Toast.LENGTH_SHORT).show();
         }
 
-        if(password.length()<6){
+        if(password.length() < 6){
             Toast.makeText(getApplicationContext(),"Password must be at least 6 characters",Toast.LENGTH_SHORT).show();
         }
 
@@ -65,7 +72,8 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if(task.isSuccessful()){
-                            startActivity(new Intent(getApplicationContext(),MainActivity.class));
+                            Toast.makeText(getApplicationContext(),"Successfully created account",Toast.LENGTH_SHORT).show();
+                            startActivity(new Intent(getApplicationContext(), ChatRoomActivity.class));
                             finish();
                         }
                         else{
