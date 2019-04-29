@@ -8,7 +8,6 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
@@ -19,7 +18,6 @@ public class MainActivity extends AppCompatActivity {
 
     EditText etEmail, etPassword;
     FirebaseAuth firebaseAuth;
-    GoogleApiClient mGoogleApiClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,7 +88,6 @@ public class MainActivity extends AppCompatActivity {
                         if(task.isSuccessful()){
                             Toast.makeText(getApplicationContext(),"Successfully created account",Toast.LENGTH_SHORT).show();
                             // startActivity(new Intent(getApplicationContext(), ChatRoomActivity.class));
-                            finish();
                         }
                         else{
                             Toast.makeText(getApplicationContext(),"E-mail or password is wrong",Toast.LENGTH_SHORT).show();
