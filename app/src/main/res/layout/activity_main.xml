@@ -9,7 +9,7 @@
     <EditText
         android:layout_height="wrap_content"
         android:layout_width="500px"
-        android:hint="Username"
+        android:hint="Email"
         android:inputType="textEmailAddress"
         android:id="@+id/etEmail"/>
 
