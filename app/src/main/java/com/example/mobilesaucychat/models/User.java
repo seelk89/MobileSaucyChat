@@ -1,7 +1,6 @@
 package com.example.mobilesaucychat.models;
 
 public class User {
-    private long m_id;
     private String m_email;
     private double m_latLocation;
     private double m_lonLocation;
@@ -14,14 +13,6 @@ public class User {
     ) {
         m_email = email;
         m_displayName = displayName;
-    }
-
-    public long getId() {
-        return m_id;
-    }
-
-    public void setId(long id) {
-        m_id = id;
     }
 
     public String getEmail() {
