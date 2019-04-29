@@ -3,7 +3,6 @@ package com.example.mobilesaucychat.models;
 public class User {
     private long m_id;
     private String m_email;
-    private String m_password;
     private double m_latLocation;
     private double m_lonLocation;
     private String m_displayName;
@@ -11,11 +10,9 @@ public class User {
 
     public User(
             String email,
-            String password,
             String displayName
     ) {
         m_email = email;
-        m_password = password;
         m_displayName = displayName;
     }
 
@@ -33,14 +30,6 @@ public class User {
 
     public void setEmail(String email) {
         m_email = email;
-    }
-
-    public String getPassword() {
-        return m_password;
-    }
-
-    public void setPassword(String password) {
-        m_password = password;
     }
 
     public double getLatLocation() {

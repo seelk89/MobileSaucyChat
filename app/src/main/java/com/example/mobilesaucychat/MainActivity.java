@@ -1,13 +1,16 @@
 package com.example.mobilesaucychat;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.example.mobilesaucychat.models.User;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -17,9 +20,12 @@ import com.google.firebase.auth.FirebaseUser;
 
 public class MainActivity extends AppCompatActivity {
 
+    public static String EMAIL_INFO = "EmailInfo";
+    public static String PASS_INFO = "PassInfo";
+
+
     EditText etEmail, etPassword;
     FirebaseAuth firebaseAuth;
-    GoogleApiClient mGoogleApiClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,7 +78,6 @@ public class MainActivity extends AppCompatActivity {
     private void onClickSignUpWithEmailAndPassword(String email, String password) {
         if(TextUtils.isEmpty(email)){
             Toast.makeText(getApplicationContext(),"Please fill in the required email field", Toast.LENGTH_SHORT).show();
-            return;
         }
 
         if(TextUtils.isEmpty(password)){
@@ -83,19 +88,9 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(getApplicationContext(),"Password must be at least 6 characters", Toast.LENGTH_SHORT).show();
         }
 
-        firebaseAuth.createUserWithEmailAndPassword(email, password)
-                .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if(task.isSuccessful()){
-                            Toast.makeText(getApplicationContext(),"Successfully created account",Toast.LENGTH_SHORT).show();
-                            // startActivity(new Intent(getApplicationContext(), ChatRoomActivity.class));
-                            finish();
-                        }
-                        else{
-                            Toast.makeText(getApplicationContext(),"E-mail or password is wrong",Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                });
+        Intent newActivity = new Intent(this, UserPageActivity.class);
+        newActivity.putExtra(EMAIL_INFO, email);
+        newActivity.putExtra(PASS_INFO, password);
+        startActivity(newActivity);
     }
 }

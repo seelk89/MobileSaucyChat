@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">MobileSaucyChat</string>
+    <string name="logOut">Log Out</string>
+    <string name="save">Save</string>
+    <string name="username">Email</string>
+    <string name="displayname">DisplayName</string>
+    <string name="pass">Password</string>
+
 </resources>
