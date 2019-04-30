@@ -1,4 +1,4 @@
-package com.example.mobilesaucychat;
+package com.example.mobilesaucychat.Shared;
 
 public class Variables {
     // static variable single_instance of type Variables

@@ -1,62 +1,64 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    xmlns:tools="http://schemas.android.com/tools">
-
-    <include
-        android:id="@+id/toolbar"
-        layout="@layout/toolbar" />
+    android:layout_height="match_parent">
 
     <ImageView
         android:id="@+id/imgViewUser"
-        android:layout_below="@+id/toolbar"
-        android:layout_centerHorizontal="true"
         android:layout_width="fill_parent"
         android:layout_height="400dp"
-        android:src="@drawable/face"
-        />
+        android:layout_below="@+id/toolbar"
+        android:layout_centerHorizontal="true"
+        android:src="@drawable/face" />
 
     <EditText
         android:id="@+id/etEmail"
-        android:hint="@string/username"
-        android:layout_above="@+id/etPassword"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_above="@+id/etPassword"
         android:ems="10"
+        android:hint="@string/username"
         android:inputType="textEmailAddress" />
 
     <EditText
         android:id="@+id/etPassword"
-        android:hint="@string/pass"
-        android:layout_above="@+id/etDisplayName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_above="@+id/etDisplayName"
         android:ems="10"
+        android:hint="@string/pass"
         android:inputType="textPersonName" />
 
     <EditText
         android:id="@+id/etDisplayName"
-        android:hint="@string/displayname"
-        android:layout_above="@+id/btnSave"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_above="@+id/btnSave"
         android:ems="10"
+        android:hint="@string/displayname"
         android:inputType="textPersonName" />
 
     <Button
         android:id="@+id/btnSave"
-        android:layout_above="@+id/btnLogout"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="@string/save"/>
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="100dp"
+        android:text="@string/save" />
 
     <Button
         android:id="@+id/btnLogout"
-        android:layout_alignParentBottom="true"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        android:layout_above="@id/btnDeleteUser"
         android:text="@string/logOut" />
 
+    <Button
+        android:id="@+id/btnDeleteUser"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:text="@string/deleteUser" />
 </RelativeLayout>
