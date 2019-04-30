@@ -1,6 +1,5 @@
 package com.example.mobilesaucychat;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -27,12 +26,17 @@ public class UserPageActivity extends AppCompatActivity {
     Button btnSave, btnLogout;
     ImageView imgFriend;
     FirebaseAuth firebaseAuth;
+    Variables variables;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_page);
+
+        variables = Variables.getInstance();
+
         firebaseAuth = FirebaseAuth.getInstance();
+
         findViews();
         onClickListeners();
         setSupportActionBar(mToolbar);
@@ -49,8 +53,8 @@ public class UserPageActivity extends AppCompatActivity {
         imgFriend = findViewById(R.id.imgViewUser);
 
         displayName = etDisplayname.getText().toString().trim();
-        email = getIntent().getSerializableExtra(MainActivity.EMAIL_INFO).toString().trim();
-        password = getIntent().getSerializableExtra(MainActivity.PASS_INFO).toString().trim();
+        email = getIntent().getSerializableExtra(variables.EMAIL_INFO).toString().trim();
+        password = getIntent().getSerializableExtra(variables.PASSWORD_INFO).toString().trim();
 
         etEmail.append(email);
         etPassword.append(password);

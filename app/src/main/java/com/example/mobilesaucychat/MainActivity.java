@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -18,17 +17,16 @@ import com.google.firebase.auth.FirebaseUser;
 
 public class MainActivity extends AppCompatActivity {
 
-    public static String EMAIL_INFO = "EmailInfo";
-    public static String PASS_INFO = "PassInfo";
-
-
     EditText etEmail, etPassword;
     FirebaseAuth firebaseAuth;
+    Variables variables;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        variables = Variables.getInstance();
 
         firebaseAuth = FirebaseAuth.getInstance();
 
@@ -87,8 +85,8 @@ public class MainActivity extends AppCompatActivity {
         }
 
         Intent newActivity = new Intent(this, UserPageActivity.class);
-        newActivity.putExtra(EMAIL_INFO, email);
-        newActivity.putExtra(PASS_INFO, password);
+        newActivity.putExtra(variables.EMAIL_INFO, email);
+        newActivity.putExtra(variables.PASSWORD_INFO, password);
         startActivity(newActivity);
     }
 }
