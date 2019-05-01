@@ -6,18 +6,23 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 public class ChatRoomActivity extends AppCompatActivity {
 
     Toolbar mToolbar;
-    ImageButton imgBtnSend;
+   ImageButton imgBtnSend;
     EditText etSend;
+    ListView lstViewMessage;
 
     FirebaseAuth firebaseAuth;
 
@@ -27,17 +32,38 @@ public class ChatRoomActivity extends AppCompatActivity {
         setContentView(R.layout.activity_chat_room);
 
         firebaseAuth.getInstance();
-        mToolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(mToolbar);
 
         findViews();
         setTitle("");
     }
 
-    private void findViews() {
-        
-        imgBtnSend.findViewById(R.id.imgBtnSend);
-        etSend.findViewById(R.id.etSend);
+    public void findViews() {
+        mToolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(mToolbar);
+        lstViewMessage = findViewById(R.id.lstViewMessage);
+        etSend = findViewById(R.id.etSend);
+        imgBtnSend = findViewById(R.id.imgBtnSend);
+
+        setListeners();
+    }
+
+    private void setListeners()
+    {
+     imgBtnSend.setOnClickListener(new View.OnClickListener() {
+         @Override
+         public void onClick(View v) {
+             onClickSendMessage();
+             Toast.makeText(getApplicationContext(), "You have clicked", Toast.LENGTH_SHORT).show();
+         }
+     });
+    }
+
+    private void onClickSendMessage() {
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference myRef = database.getReference("message");
+
+        myRef.setValue(etSend.toString().trim());
+        Toast.makeText(getApplicationContext(), "You have sent a message", Toast.LENGTH_SHORT).show();
     }
 
     @Override

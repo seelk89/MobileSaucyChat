@@ -6,5 +6,6 @@
     <string name="displayname">DisplayName</string>
     <string name="pass">Password</string>
     <string name="deleteUser">Delete User</string>
+    <string name="saucychatting">Start saucychatting</string>
 
 </resources>
