@@ -7,23 +7,27 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.example.mobilesaucychat.models.Message;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.List;
 
 public class ChatRoomActivity extends AppCompatActivity {
 
     Toolbar mToolbar;
-   ImageButton imgBtnSend;
+    ImageButton imgBtnSend;
     EditText etSend;
     ListView lstViewMessage;
-
+    List<Message> messageList;
     FirebaseAuth firebaseAuth;
 
     @Override
@@ -31,10 +35,13 @@ public class ChatRoomActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat_room);
 
-        firebaseAuth.getInstance();
+        FirebaseAuth.getInstance();
 
+        // Get firebase messages
+        readMessages();
         findViews();
         setTitle("");
+
     }
 
     public void findViews() {
@@ -44,18 +51,23 @@ public class ChatRoomActivity extends AppCompatActivity {
         etSend = findViewById(R.id.etSend);
         imgBtnSend = findViewById(R.id.imgBtnSend);
 
+        //lstViewMessage.setAdapter(new MessageListAdapter(this, messageList));
+
         setListeners();
     }
 
-    private void setListeners()
-    {
-     imgBtnSend.setOnClickListener(new View.OnClickListener() {
-         @Override
-         public void onClick(View v) {
-             onClickSendMessage();
-             Toast.makeText(getApplicationContext(), "You have clicked", Toast.LENGTH_SHORT).show();
-         }
-     });
+    private void readMessages() {
+        CollectionReference fbFirestore = FirebaseFirestore.getInstance().collection("messages");
+    }
+
+    private void setListeners() {
+        imgBtnSend.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onClickSendMessage();
+                Toast.makeText(getApplicationContext(), "You have clicked", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void onClickSendMessage() {

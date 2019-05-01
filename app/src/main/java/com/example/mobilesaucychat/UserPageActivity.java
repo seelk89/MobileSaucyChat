@@ -20,6 +20,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 public class UserPageActivity extends AppCompatActivity {
 
@@ -60,19 +61,16 @@ public class UserPageActivity extends AppCompatActivity {
         etDisplayname = findViewById(R.id.etDisplayName);
         imgFriend = findViewById(R.id.imgViewUser);
 
-        if (firebaseAuth.getCurrentUser() == null)
-        {
+        if (firebaseAuth.getCurrentUser() == null) {
             displayName = etDisplayname.getText().toString().trim();
             email = getIntent().getSerializableExtra(variables.EMAIL_INFO).toString().trim();
             password = getIntent().getSerializableExtra(variables.PASSWORD_INFO).toString().trim();
 
             etEmail.append(email);
             etPassword.append(password);
-        }
-        else
-        {
-          etEmail.setText(firebaseAuth.getCurrentUser().getEmail());
-          etDisplayname.setText(firebaseAuth.getCurrentUser().getDisplayName());
+        } else {
+            etEmail.setText(firebaseAuth.getCurrentUser().getEmail());
+            etDisplayname.setText(firebaseAuth.getCurrentUser().getDisplayName());
         }
     }
 
@@ -102,7 +100,7 @@ public class UserPageActivity extends AppCompatActivity {
 
     private void deleteUser() {
         firebaseAuth.getCurrentUser().delete();
-        Toast.makeText(getApplicationContext(), "We're sad to see you leave... NOT", Toast.LENGTH_SHORT).show();
+        Toast.makeText(getApplicationContext(), "We're sad to see you leave...", Toast.LENGTH_SHORT).show();
         startActivity(new Intent(getApplicationContext(), MainActivity.class));
     }
 
@@ -123,10 +121,9 @@ public class UserPageActivity extends AppCompatActivity {
                                     email,
                                     displayName = etDisplayname.getText().toString().trim()
                             );
-
-                            FirebaseDatabase.getInstance().getReference("users").
-                                    child(FirebaseAuth.getInstance().getCurrentUser().getUid()).setValue(user);
-
+                            FirebaseFirestore.getInstance().collection("users")
+                                    .document(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                                    .set(user);
                             Toast.makeText(getApplicationContext(), "Successfully created account", Toast.LENGTH_SHORT).show();
                             startActivity(new Intent(getApplicationContext(), ChatRoomActivity.class));
                         } else {
