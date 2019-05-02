@@ -28,6 +28,8 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class ChatRoomActivity extends AppCompatActivity {
@@ -88,6 +90,12 @@ public class ChatRoomActivity extends AppCompatActivity {
                         Message m = d.toObject(Message.class);
                         messageList.add(m);
                     }
+                    Collections.sort(messageList, new Comparator<Message>() {
+                        @Override
+                        public int compare(Message message1, Message message2) {
+                            return message2.getTime().compareTo(message1.getTime());
+                        }
+                    });
                     messageListAdapter.notifyDataSetChanged();
                 } else {
                     Toast.makeText(getApplicationContext(), "Messages collection is empty", Toast.LENGTH_SHORT).show();
