@@ -1,24 +1,33 @@
 package com.example.mobilesaucychat;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.ListView;
 import android.widget.Toast;
 
+import com.example.mobilesaucychat.adapters.MessageListAdapter;
 import com.example.mobilesaucychat.models.Message;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ChatRoomActivity extends AppCompatActivity {
@@ -26,28 +35,41 @@ public class ChatRoomActivity extends AppCompatActivity {
     Toolbar mToolbar;
     ImageButton imgBtnSend;
     EditText etSend;
-    ListView lstViewMessage;
-    List<Message> messageList;
+    RecyclerView rclViewMessage;
+    ArrayList messageList;
+    MessageListAdapter messageListAdapter;
     FirebaseAuth firebaseAuth;
+    FirebaseFirestore fbFirestore;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat_room);
 
-        FirebaseAuth.getInstance();
+        firebaseAuth = FirebaseAuth.getInstance();
+        fbFirestore = FirebaseFirestore.getInstance();
+
+        messageList = new ArrayList<>();
+        messageListAdapter = new MessageListAdapter(this, messageList);
+
+        findViews();
 
         // Get firebase messages
         readMessages();
-        findViews();
-        setTitle("");
 
+        setTitle("");
     }
 
     public void findViews() {
         mToolbar = findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
-        lstViewMessage = findViewById(R.id.lstViewMessage);
+        mToolbar.setBackgroundColor(Color.parseColor("#ff0000"));
+
+        rclViewMessage = findViewById(R.id.lstViewMessage);
+        rclViewMessage.setHasFixedSize(true);
+        rclViewMessage.setLayoutManager(new LinearLayoutManager(this));
+        rclViewMessage.setAdapter(messageListAdapter);
+
         etSend = findViewById(R.id.etSend);
         imgBtnSend = findViewById(R.id.imgBtnSend);
 
@@ -57,7 +79,21 @@ public class ChatRoomActivity extends AppCompatActivity {
     }
 
     private void readMessages() {
-        CollectionReference fbFirestore = FirebaseFirestore.getInstance().collection("messages");
+        fbFirestore.collection("messages").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+            @Override
+            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                if (!queryDocumentSnapshots.isEmpty()) {
+                    List<DocumentSnapshot> documentSnapshotList = queryDocumentSnapshots.getDocuments();
+                    for (DocumentSnapshot d : documentSnapshotList) {
+                        Message m = d.toObject(Message.class);
+                        messageList.add(m);
+                    }
+                    messageListAdapter.notifyDataSetChanged();
+                } else {
+                    Toast.makeText(getApplicationContext(), "Messages collection is empty", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
     }
 
     private void setListeners() {
@@ -65,17 +101,36 @@ public class ChatRoomActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 onClickSendMessage();
-                Toast.makeText(getApplicationContext(), "You have clicked", Toast.LENGTH_SHORT).show();
             }
         });
     }
 
     private void onClickSendMessage() {
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference myRef = database.getReference("message");
+        String etText = etSend.getText().toString().trim();
 
-        myRef.setValue(etSend.toString().trim());
-        Toast.makeText(getApplicationContext(), "You have sent a message", Toast.LENGTH_SHORT).show();
+        CollectionReference fbFs = fbFirestore.collection("messages");
+
+        Message message = new Message(
+                firebaseAuth.getCurrentUser().getUid(),
+                etText,
+                Timestamp.now()
+        );
+
+        fbFs.add(message)
+                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                    @Override
+                    public void onSuccess(DocumentReference documentReference) {
+                        Toast.makeText(ChatRoomActivity.this, "Message added", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Toast.makeText(ChatRoomActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+        readMessages();
     }
 
     @Override

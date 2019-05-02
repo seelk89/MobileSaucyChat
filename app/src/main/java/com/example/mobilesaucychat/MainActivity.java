@@ -1,15 +1,10 @@
 package com.example.mobilesaucychat;
 
-import android.Manifest;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -19,10 +14,6 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-
-import java.util.Collections;
-import java.util.Comparator;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -54,6 +45,11 @@ public class MainActivity extends AppCompatActivity {
                 onClickSignUpWithEmailAndPassword(etEmail.getText().toString(), etPassword.getText().toString());
             }
         });
+
+        if(firebaseAuth.getCurrentUser() != null)
+        {
+            startActivity(new Intent(getApplicationContext(), ChatRoomActivity.class));
+        }
     }
 
     private void onClickSignIn(String email, String password) {
@@ -64,7 +60,6 @@ public class MainActivity extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             // Sign in success, update UI with the signed-in user's information
                             Toast.makeText(MainActivity.this, "Successfully signed in.", Toast.LENGTH_SHORT).show();
-                            FirebaseUser user = firebaseAuth.getCurrentUser();
                             startActivity(new Intent(getApplicationContext(), ChatRoomActivity.class));
                         } else {
                             // If sign in fails, display a message to the user.

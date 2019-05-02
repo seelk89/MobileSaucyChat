@@ -1,49 +1,39 @@
 package com.example.mobilesaucychat.models;
 
-import java.util.Date;
+import com.google.firebase.Timestamp;
 
 public class Message {
-    private long m_id;
-    private long m_userId;
-    private String m_message;
-    private String m_imageId;
-    private Date m_time;
+    private String userId, text, imageId;
+    private Timestamp time;
+
+    public Message() {
+    }
 
     public Message(
-            long userId,
-            String message,
-            String imageId,
-            Date time
+            String userId,
+            String text,
+            //String imageId,
+            Timestamp time
     ) {
-        m_userId = userId;
-        m_message = message;
-        m_imageId = imageId;
-        m_time = time;
+        this.userId = userId;
+        this.text = text;
+        //this.imageId = imageId;
+        this.time = time;
     }
 
-    public long getId() {
-        return m_id;
-    }
+    public String getUserId() { return userId; }
 
-    public void setId(long id) {
-        m_id = id;
-    }
+    public void setUserId(String userId) { this.userId = userId; }
 
-    public long getUserId() { return m_userId; }
+    public String getText() { return text; }
 
-    public void setUserId(long userId) {
-        m_userId = userId;
-    }
+    public void setText(String text) { this.text = text; }
 
-    public String getMessage() { return m_message; }
+    public String getImageId() { return imageId; }
 
-    public void setMessage(String message) { m_message = message; }
+    public void setImageId(String imageId) { this.imageId = imageId; }
 
-    public String getImageId() { return m_imageId; }
+    public Timestamp getTime() { return time; }
 
-    public void setImageId(String imageId) { m_imageId = imageId; }
-
-    public Date getTime() { return m_time; }
-
-    public void setTime(Date time) { m_time = time; }
+    public void setTime(Timestamp time) { this.time = time; }
 }
