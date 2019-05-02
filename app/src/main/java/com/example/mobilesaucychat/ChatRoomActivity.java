@@ -24,13 +24,17 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+
+import javax.annotation.Nullable;
 
 public class ChatRoomActivity extends AppCompatActivity {
 
@@ -56,10 +60,35 @@ public class ChatRoomActivity extends AppCompatActivity {
 
         findViews();
 
-        // Get firebase messages
         readMessages();
+    }
 
-        setTitle("");
+    @Override
+    protected void onStart() {
+        super.onStart();
+        fbFirestore.collection("messages").addSnapshotListener(this, new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+                if (e != null) {
+                    Toast.makeText(getApplicationContext(), "Error while loading", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                if (!queryDocumentSnapshots.isEmpty()) {
+                    List<DocumentSnapshot> documentSnapshotList = queryDocumentSnapshots.getDocuments();
+                    for (DocumentSnapshot d : documentSnapshotList) {
+                        Message m = d.toObject(Message.class);
+                        messageList.add(m);
+                    }
+                    Collections.sort(messageList, new Comparator<Message>() {
+                        @Override
+                        public int compare(Message message1, Message message2) {
+                            return message2.getTime().compareTo(message1.getTime());
+                        }
+                    });
+                    messageListAdapter.notifyDataSetChanged();
+                }
+            }
+        });
     }
 
     public void findViews() {
@@ -75,7 +104,7 @@ public class ChatRoomActivity extends AppCompatActivity {
         etSend = findViewById(R.id.etSend);
         imgBtnSend = findViewById(R.id.imgBtnSend);
 
-        //lstViewMessage.setAdapter(new MessageListAdapter(this, messageList));
+        setTitle("");
 
         setListeners();
     }
@@ -97,8 +126,6 @@ public class ChatRoomActivity extends AppCompatActivity {
                         }
                     });
                     messageListAdapter.notifyDataSetChanged();
-                } else {
-                    Toast.makeText(getApplicationContext(), "Messages collection is empty", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -137,8 +164,6 @@ public class ChatRoomActivity extends AppCompatActivity {
                         Toast.makeText(ChatRoomActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 });
-
-        readMessages();
     }
 
     @Override
