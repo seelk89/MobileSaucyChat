@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -8,35 +7,34 @@
         android:id="@+id/toolbar"
         layout="@layout/toolbar" />
 
-            <android.support.v7.widget.RecyclerView
-                android:id="@+id/lstViewMessage"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_below="@+id/toolbar"
-                android:layout_above="@+id/relativeBottom"/>
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/lstViewMessage"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/relativeBottom"
+        android:layout_below="@+id/toolbar" />
 
-            <RelativeLayout
-                android:id="@+id/relativeBottom"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="5dp"
-                android:background="#fff"
-                android:layout_alignParentBottom="true">
+    <RelativeLayout
+        android:id="@+id/relativeBottom"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="#fff"
+        android:padding="5dp">
 
-                <EditText
-                    android:id="@+id/etSend"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="@string/saucychatting"
-                    android:layout_centerVertical="true"
-                    android:layout_toStartOf="@id/imgBtnSend"/>
+        <EditText
+            android:id="@+id/etSend"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_toStartOf="@id/imgBtnSend"
+            android:hint="@string/saucychatting" />
 
-                <ImageButton
-                    android:id="@+id/imgBtnSend"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:layout_alignParentEnd="true"
-                    android:background="@drawable/ic_action_name" />
-            </RelativeLayout>
-
+        <ImageButton
+            android:id="@+id/imgBtnSend"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_alignParentEnd="true"
+            android:background="@drawable/ic_action_name" />
+    </RelativeLayout>
 </RelativeLayout>

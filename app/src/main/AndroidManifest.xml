@@ -15,8 +15,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".ChatRoomActivity"></activity>
-        <activity android:name=".UserPageActivity"></activity>
+        <activity android:name=".ChatRoomActivity" android:configChanges="orientation|screenSize"></activity>
+        <activity android:name=".UserPageActivity" android:configChanges="orientation|screenSize"></activity>
     </application>
     <uses-permission android:name="android.permission.INTERNET"/>
 </manifest>

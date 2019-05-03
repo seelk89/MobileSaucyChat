@@ -94,7 +94,7 @@ public class ChatRoomActivity extends AppCompatActivity {
     public void findViews() {
         mToolbar = findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
-        mToolbar.setBackgroundColor(Color.parseColor("#ff0000"));
+        mToolbar.setBackgroundColor(Color.parseColor("#DC143C"));
 
         rclViewMessage = findViewById(R.id.lstViewMessage);
         rclViewMessage.setHasFixedSize(true);
