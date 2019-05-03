@@ -45,7 +45,7 @@ public class ChatRoomActivity extends AppCompatActivity {
     ArrayList messageList;
     MessageListAdapter messageListAdapter;
     FirebaseAuth firebaseAuth;
-    FirebaseFirestore fbFirestore;
+    FirebaseFirestore firebaseFirestore;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,7 +53,7 @@ public class ChatRoomActivity extends AppCompatActivity {
         setContentView(R.layout.activity_chat_room);
 
         firebaseAuth = FirebaseAuth.getInstance();
-        fbFirestore = FirebaseFirestore.getInstance();
+        firebaseFirestore = FirebaseFirestore.getInstance();
 
         messageList = new ArrayList<>();
         messageListAdapter = new MessageListAdapter(this, messageList);
@@ -66,7 +66,7 @@ public class ChatRoomActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        fbFirestore.collection("messages").addSnapshotListener(this, new EventListener<QuerySnapshot>() {
+        firebaseFirestore.collection("messages").addSnapshotListener(this, new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
                 if (e != null) {
@@ -110,7 +110,7 @@ public class ChatRoomActivity extends AppCompatActivity {
     }
 
     private void readMessages() {
-        fbFirestore.collection("messages").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+        firebaseFirestore.collection("messages").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
             @Override
             public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
                 if (!queryDocumentSnapshots.isEmpty()) {
@@ -143,7 +143,7 @@ public class ChatRoomActivity extends AppCompatActivity {
     private void onClickSendMessage() {
         String etText = etSend.getText().toString().trim();
 
-        CollectionReference fbFs = fbFirestore.collection("messages");
+        CollectionReference fbFs = firebaseFirestore.collection("messages");
 
         Message message = new Message(
                 firebaseAuth.getCurrentUser().getUid(),
