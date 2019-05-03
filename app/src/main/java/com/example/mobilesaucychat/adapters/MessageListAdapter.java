@@ -10,6 +10,7 @@ import android.widget.TextView;
 
 import com.example.mobilesaucychat.R;
 import com.example.mobilesaucychat.models.Message;
+import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.List;
 
@@ -17,27 +18,47 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
 
     Context context;
     List<Message> data;
+    FirebaseAuth firebaseAuth;
 
-    private static LayoutInflater inflater = null;
+    private int VIEW_TYPE_MESSAGE_SENT = 1;
+    private int VIEW_TYPE_MESSAGE_RECEIVED = 2;
+
+    //private static LayoutInflater inflater = null;
 
     public MessageListAdapter(Context context, List<Message> data) {
         this.context = context;
         this.data = data;
+        firebaseAuth = FirebaseAuth.getInstance();
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        if (data.get(position).getUserId().equals(firebaseAuth.getCurrentUser().getUid())) {
+            return VIEW_TYPE_MESSAGE_RECEIVED;
+        } else {
+            return VIEW_TYPE_MESSAGE_SENT;
+        }
     }
 
     @NonNull
     @Override
     public MessageViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
-        return new MessageViewHolder(
-                LayoutInflater.from(context).inflate(R.layout.message_list_row, viewGroup, false)
-        );
+        if (i == VIEW_TYPE_MESSAGE_SENT) {
+            return new MessageViewHolder(
+                    LayoutInflater.from(context).inflate(R.layout.sent_message_holder, viewGroup, false)
+            );
+        } else if (i == VIEW_TYPE_MESSAGE_RECEIVED) {
+            return new MessageViewHolder(
+                    LayoutInflater.from(context).inflate(R.layout.received_message_holder, viewGroup, false)
+            );
+        }
+        return null;
     }
 
     @Override
-    public void onBindViewHolder(@NonNull MessageViewHolder messageViewHolder, int i) {
+    public void onBindViewHolder(@NonNull MessageViewHolder messageListRow, int i) {
         Message message = data.get(i);
-
-        messageViewHolder.txtMessage.setText(message.getText());
+        messageListRow.txtMessage.setText(message.getText());
     }
 
     @Override
@@ -46,13 +67,11 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
     }
 
     class MessageViewHolder extends RecyclerView.ViewHolder {
-
         TextView txtMessage;
 
-        public MessageViewHolder(View messageView) {
-            super(messageView);
-
-            txtMessage = messageView.findViewById(R.id.txtMessage);
+        public MessageViewHolder(View messageListRow) {
+            super(messageListRow);
+            txtMessage = messageListRow.findViewById(R.id.txtMessage);
         }
     }
 }
