@@ -21,7 +21,7 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
@@ -32,7 +32,6 @@ import com.google.firebase.firestore.QuerySnapshot;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.List;
 
 import javax.annotation.Nullable;
 
@@ -60,7 +59,7 @@ public class ChatRoomActivity extends AppCompatActivity {
 
         findViews();
 
-        readMessages();
+        //readMessages();
     }
 
     @Override
@@ -74,9 +73,16 @@ public class ChatRoomActivity extends AppCompatActivity {
                     return;
                 }
                 if (!queryDocumentSnapshots.isEmpty()) {
+                    /*
                     List<DocumentSnapshot> documentSnapshotList = queryDocumentSnapshots.getDocuments();
                     for (DocumentSnapshot d : documentSnapshotList) {
                         Message m = d.toObject(Message.class);
+                        messageList.add(m);
+                    }
+                    */
+                    for (DocumentChange dc : queryDocumentSnapshots.getDocumentChanges()) {
+                        DocumentSnapshot documentSnapshot = dc.getDocument();
+                        Message m = documentSnapshot.toObject(Message.class);
                         messageList.add(m);
                     }
                     Collections.sort(messageList, new Comparator<Message>() {
@@ -106,9 +112,35 @@ public class ChatRoomActivity extends AppCompatActivity {
 
         setTitle("");
 
-        setListeners();
+        imgBtnSend.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String text = etSend.getText().toString().trim();
+
+                final Message message = new Message(
+                        firebaseAuth.getCurrentUser().getUid(),
+                        text,
+                        Timestamp.now()
+                );
+
+                firebaseFirestore.collection("messages").add(message)
+                        .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                            @Override
+                            public void onSuccess(DocumentReference documentReference) {
+                                Toast.makeText(ChatRoomActivity.this, "Message added", Toast.LENGTH_SHORT).show();
+                            }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Toast.makeText(ChatRoomActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                            }
+                        });
+            }
+        });
     }
 
+    /*
     private void readMessages() {
         firebaseFirestore.collection("messages").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
             @Override
@@ -130,41 +162,7 @@ public class ChatRoomActivity extends AppCompatActivity {
             }
         });
     }
-
-    private void setListeners() {
-        imgBtnSend.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onClickSendMessage();
-            }
-        });
-    }
-
-    private void onClickSendMessage() {
-        String etText = etSend.getText().toString().trim();
-
-        CollectionReference fbFs = firebaseFirestore.collection("messages");
-
-        Message message = new Message(
-                firebaseAuth.getCurrentUser().getUid(),
-                etText,
-                Timestamp.now()
-        );
-
-        fbFs.add(message)
-                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                    @Override
-                    public void onSuccess(DocumentReference documentReference) {
-                        Toast.makeText(ChatRoomActivity.this, "Message added", Toast.LENGTH_SHORT).show();
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(ChatRoomActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
-                    }
-                });
-    }
+    */
 
     @Override
     public boolean onCreateOptionsMenu(Menu menuClass) {
