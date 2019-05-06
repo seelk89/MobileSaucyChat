@@ -5,6 +5,7 @@
 
     <ImageView
         android:id="@+id/imgViewUser"
+        android:clickable="true"
         android:layout_width="fill_parent"
         android:layout_height="300dp"
         android:layout_alignParentTop="true"
