@@ -136,6 +136,7 @@ public class ChatRoomActivity extends AppCompatActivity {
                                 Toast.makeText(ChatRoomActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
                             }
                         });
+                etSend.setText("");
             }
         });
     }
