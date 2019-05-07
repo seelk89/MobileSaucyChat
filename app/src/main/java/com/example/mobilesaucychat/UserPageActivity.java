@@ -1,20 +1,14 @@
 package com.example.mobilesaucychat;
 
 import android.Manifest;
-import android.app.Activity;
-import android.content.ClipData;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.StrictMode;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -25,7 +19,6 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import com.example.mobilesaucychat.Shared.CameraHelper;
 import com.example.mobilesaucychat.Shared.Variables;
 import com.example.mobilesaucychat.models.User;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -40,7 +33,6 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
 import java.io.File;
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -75,15 +67,13 @@ public class UserPageActivity extends AppCompatActivity {
         variables = Variables.getInstance();
 
         firebaseAuth = FirebaseAuth.getInstance();
+
         mStorageRef = FirebaseStorage.getInstance().getReference();
+
         findViews();
         onClickListeners();
         setSupportActionBar(mToolbar);
         setTitle("");
-        if (firebaseAuth.getCurrentUser() == null) {
-            btnLogout.setVisibility(View.GONE);
-            btnDeleteUser.setVisibility(View.GONE);
-        }
     }
 
     public void findViews() {
@@ -106,6 +96,10 @@ public class UserPageActivity extends AppCompatActivity {
         } else {
             etEmail.setText(firebaseAuth.getCurrentUser().getEmail());
             etDisplayname.setText(firebaseAuth.getCurrentUser().getDisplayName());
+        }
+        if (firebaseAuth.getCurrentUser() == null) {
+            btnLogout.setVisibility(View.GONE);
+            btnDeleteUser.setVisibility(View.GONE);
         }
     }
 
@@ -137,56 +131,32 @@ public class UserPageActivity extends AppCompatActivity {
         imgFriend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                takePicture();
-                //     openCamera();
+                openCamera();
             }
         });
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menuClass) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu, menuClass);
+        return true;
+    }
 
-    private void takePicture() {
-        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-            Uri photoURI = null;
-            try {
-                File photoFile = createImageFileWith();
-                path = photoFile.getAbsolutePath();
-              /*  photoURI = FileProvider.getUriForFile(this,
-                        "222",
-                        photoFile);*/
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE) {
+            if (resultCode == RESULT_OK) {
+                uploadPicture();
+                showPictureTaken(mFile);
 
-            } catch (IOException ex) {
-                Log.e("TakePicture", ex.getMessage());
-            }
-            takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
-            if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.LOLLIPOP) {
-                takePictureIntent.setClipData(ClipData.newRawUri("", photoURI));
-                takePictureIntent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-            }
-            startActivityForResult(takePictureIntent, PHOTO_REQUEST_CODE);
+            } else if (resultCode == RESULT_CANCELED) {
+                Toast.makeText(this, "Canceled...", Toast.LENGTH_LONG).show();
+                return;
+
+            } else
+                Toast.makeText(this, "Picture NOT taken - unknown error...", Toast.LENGTH_LONG).show();
         }
-    }
-
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == PHOTO_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
-            Bitmap source = BitmapFactory.decodeFile(path, provideCompressionBitmapFactoryOptions());
-            imgFriend.setImageBitmap(source);
-        }
-    }
-
-    private static BitmapFactory.Options provideCompressionBitmapFactoryOptions() {
-        BitmapFactory.Options opt = new BitmapFactory.Options();
-        opt.inJustDecodeBounds = false;
-        opt.inPreferredConfig = Bitmap.Config.RGB_565;
-        return opt;
-    }
-
-    public File createImageFileWith() throws IOException {
-        final String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        final String imageFileName = "JPEG_" + timestamp;
-        File storageDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "pics");
-        storageDir.mkdirs();
-        return File.createTempFile(imageFileName, ".jpg", storageDir);
     }
 
     private void openCamera() {
@@ -208,33 +178,12 @@ public class UserPageActivity extends AppCompatActivity {
             Log.d(LOGTAG, "camera app could NOT be started");
     }
 
-    public void uploadPicture() {
-        Uri file = Uri.fromFile(new File("path/to/images/userpic.jpg"));
-        StorageReference riversRef = mStorageRef.child("images/userpic.jpg");
-
-        riversRef.putFile(file)
-                .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                    @Override
-                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                        // Get a URL to the uploaded content
-                        //                    Uri downloadUrl = taskSnapshot.getDownloadUrl();
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception exception) {
-                        // Handle unsuccessful uploads
-                        // ...
-                    }
-                });
-    }
-
     /**
      * Create a File for saving an image
      */
     private File getOutputMediaFile() {
         File mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(
-                Environment.DIRECTORY_PICTURES), "MobileSaucyChat");
+                Environment.DIRECTORY_PICTURES), "Camera01");
 
         // Create the storage directory if it does not exist
         if (!mediaStorageDir.exists()) {
@@ -243,7 +192,6 @@ public class UserPageActivity extends AppCompatActivity {
                 return null;
             }
         }
-
         // Create a media file name
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
         String postfix = "jpg";
@@ -256,6 +204,33 @@ public class UserPageActivity extends AppCompatActivity {
         return mediaFile;
     }
 
+    public void uploadPicture() {
+        Uri file = Uri.fromFile(new File("images/userpic.jpg"));
+        StorageReference riversRef = mStorageRef.child("images/userpic.jpg");
+
+        riversRef.putFile(file)
+                .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                        // Get a URL to the uploaded content
+                        // Uri downloadUrl = taskSnapshot.getDownloadUrl();
+
+                        Log.d("xyz", "onSuccess: You just uploaded a picture to firestore");
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception exception) {
+                        // Handle unsuccessful uploads
+                        Log.d("xyz", "onFailure: Something went wrong...");
+                    }
+                });
+    }
+
+    private void showPictureTaken(File f) {
+        imgFriend.setImageURI(Uri.fromFile(f));
+    }
+
     //remove user from auth0 and "users" db.
     private void deleteUser() {
         firebaseAuth.getCurrentUser().delete();
@@ -264,13 +239,6 @@ public class UserPageActivity extends AppCompatActivity {
                 .delete();
         Toast.makeText(getApplicationContext(), "We're sad to see you leave...", Toast.LENGTH_SHORT).show();
         startActivity(new Intent(getApplicationContext(), MainActivity.class));
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menuClass) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu, menuClass);
-        return true;
     }
 
     public void signUp() {

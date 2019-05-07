@@ -17,7 +17,6 @@
         </activity>
         <activity android:name=".ChatRoomActivity" android:configChanges="orientation|screenSize"></activity>
         <activity android:name=".UserPageActivity" android:configChanges="orientation|screenSize"></activity>
-        <activity android:name=".Shared.CameraHelper" android:configChanges="orientation|screenSize"></activity>
     </application>
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.CAMERA" />
