@@ -19,6 +19,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.example.mobilesaucychat.Shared.Variables;
 import com.example.mobilesaucychat.models.User;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -27,8 +28,12 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
@@ -42,7 +47,10 @@ public class UserPageActivity extends AppCompatActivity {
     private final static int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 100;
     private static final int PHOTO_REQUEST_CODE = 1;
     private StorageReference mStorageRef;
+    private FirebaseDatabase database = FirebaseDatabase.getInstance();
+    FirebaseFirestore firebaseFirestore ;
     private String path;
+    String currentUserId;
     File mFile;
     String email, password, displayName;
     Toolbar mToolbar;
@@ -51,6 +59,7 @@ public class UserPageActivity extends AppCompatActivity {
     ImageView imgFriend;
     FirebaseAuth firebaseAuth;
     Variables variables;
+    User currentUser;
 
     private static final int REQUEST_TAKE_PHOTO = 1;
 
@@ -58,6 +67,8 @@ public class UserPageActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_page);
+
+        firebaseFirestore = FirebaseFirestore.getInstance();
 
         ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE}, Variables.getInstance().CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE);
@@ -74,6 +85,8 @@ public class UserPageActivity extends AppCompatActivity {
         onClickListeners();
         setSupportActionBar(mToolbar);
         setTitle("");
+
+        getCurrentUserData();
     }
 
     public void findViews() {
@@ -147,7 +160,7 @@ public class UserPageActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE) {
             if (resultCode == RESULT_OK) {
-                uploadPicture();
+                uploadPicture(mFile);
                 showPictureTaken(mFile);
 
             } else if (resultCode == RESULT_CANCELED) {
@@ -204,16 +217,24 @@ public class UserPageActivity extends AppCompatActivity {
         return mediaFile;
     }
 
-    public void uploadPicture() {
-        Uri file = Uri.fromFile(new File("images/userpic.jpg"));
-        StorageReference riversRef = mStorageRef.child("images/userpic.jpg");
+    public void uploadPicture(File newFile) {
+        Uri file = Uri.fromFile(newFile);
+        String generatedId = database.getReference("users").push().getKey();
 
-        riversRef.putFile(file)
+        StorageReference riversRef = mStorageRef.child("user-pictures/" + generatedId);
+
+        StorageMetadata metadata = new StorageMetadata.Builder()
+                .setCustomMetadata("originalName", newFile.getName())
+                .setCustomMetadata("userId", currentUserId)
+                .build();
+
+
+        riversRef.putFile(file,metadata)
                 .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                     @Override
                     public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                         // Get a URL to the uploaded content
-                        // Uri downloadUrl = taskSnapshot.getDownloadUrl();
+                         //Uri downloadUrl = taskSnapshot.getDownloadUrl();
 
                         Log.d("xyz", "onSuccess: You just uploaded a picture to firestore");
                     }
@@ -273,6 +294,46 @@ public class UserPageActivity extends AppCompatActivity {
                 .set(user);
         Toast.makeText(getApplicationContext(), "Successfully updated account", Toast.LENGTH_SHORT).show();
         startActivity(new Intent(getApplicationContext(), ChatRoomActivity.class));
+    }
+
+    private void getCurrentUserData() {
+        String email = firebaseAuth.getCurrentUser().getEmail();
+        firebaseFirestore.collection("users").whereEqualTo("email",email).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()) {
+                    for (QueryDocumentSnapshot document : task.getResult()) {
+
+                        currentUserId = document.getId();
+                        currentUser = new User(document.get("email").toString(),document.get("displayName").toString());
+
+                        if(document.get("imageId") != null) {
+                            currentUser.setImageId(document.get("imageId").toString());
+
+                            //display users image
+                            displayUsersImage();
+                        }
+                    }
+                } else {
+                    Log.d("TAG", "Error getting documents: ", task.getException());
+                }
+            }
+        });
+    }
+
+    private void displayUsersImage() {
+        mStorageRef.child("user-pictures/"+ currentUser.getImageId()).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+            @Override
+            public void onSuccess(Uri uri) {
+                Glide.with(getApplicationContext()).load(uri).into(imgFriend);
+                // Got the download URL'
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+                Log.d("ERROR", "" + exception);
+            }
+        });
     }
 }
 
