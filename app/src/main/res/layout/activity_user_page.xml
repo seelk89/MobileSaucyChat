@@ -19,24 +19,17 @@
         android:layout_below="@+id/imgViewUser"
         android:layout_centerHorizontal="true"
         android:ems="10"
+        android:focusable="false"
         android:hint="@string/username"
-        android:inputType="textEmailAddress" />
+        android:inputType="textEmailAddress"
+        android:textAlignment="center" />
 
-    <EditText
-        android:id="@+id/etPassword"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/etEmail"
-        android:layout_centerHorizontal="true"
-        android:ems="10"
-        android:hint="@string/pass"
-        android:inputType="textPersonName" />
 
     <EditText
         android:id="@+id/etDisplayName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/etPassword"
+        android:layout_below="@+id/etEmail"
         android:layout_centerHorizontal="true"
         android:ems="10"
         android:hint="@string/displayname"

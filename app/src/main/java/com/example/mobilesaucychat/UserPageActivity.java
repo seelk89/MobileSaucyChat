@@ -54,7 +54,7 @@ public class UserPageActivity extends AppCompatActivity {
     File mFile;
     String email, password, displayName;
     Toolbar mToolbar;
-    EditText etEmail, etPassword, etDisplayname;
+    EditText etEmail, etDisplayname;
     Button btnSave, btnLogout, btnDeleteUser;
     ImageView imgFriend;
     FirebaseAuth firebaseAuth;
@@ -93,7 +93,6 @@ public class UserPageActivity extends AppCompatActivity {
         btnLogout = findViewById(R.id.btnLogout);
         btnDeleteUser = findViewById(R.id.btnDeleteUser);
         etEmail = findViewById(R.id.etEmail);
-        etPassword = findViewById(R.id.etPassword);
         etDisplayname = findViewById(R.id.etDisplayName);
         imgFriend = findViewById(R.id.imgViewUser);
 
@@ -103,7 +102,6 @@ public class UserPageActivity extends AppCompatActivity {
             password = getIntent().getSerializableExtra(variables.PASSWORD_INFO).toString().trim();
 
             etEmail.append(email);
-            etPassword.append(password);
         } else {
             getCurrentUserData();
             etEmail.setText(firebaseAuth.getCurrentUser().getEmail());
