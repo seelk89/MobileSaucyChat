@@ -73,16 +73,16 @@ public class MainActivity extends AppCompatActivity {
         if (TextUtils.isEmpty(email)) {
             Toast.makeText(getApplicationContext(), "Please fill in the required email field", Toast.LENGTH_SHORT).show();
         }
-        if (TextUtils.isEmpty(password)) {
+        else if (TextUtils.isEmpty(password)) {
             Toast.makeText(getApplicationContext(), "Please fill in the required password field", Toast.LENGTH_SHORT).show();
         }
-        if (password.length() < 6) {
+        else if (password.length() < 6) {
             Toast.makeText(getApplicationContext(), "Password must be at least 6 characters", Toast.LENGTH_SHORT).show();
+        } else {
+            Intent newActivity = new Intent(this, UserPageActivity.class);
+            newActivity.putExtra(variables.EMAIL_INFO, email);
+            newActivity.putExtra(variables.PASSWORD_INFO, password);
+            startActivity(newActivity);
         }
-
-        Intent newActivity = new Intent(this, UserPageActivity.class);
-        newActivity.putExtra(variables.EMAIL_INFO, email);
-        newActivity.putExtra(variables.PASSWORD_INFO, password);
-        startActivity(newActivity);
     }
 }

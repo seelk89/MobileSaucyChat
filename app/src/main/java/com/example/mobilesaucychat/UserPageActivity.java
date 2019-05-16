@@ -85,8 +85,6 @@ public class UserPageActivity extends AppCompatActivity {
         onClickListeners();
         setSupportActionBar(mToolbar);
         setTitle("");
-
-        getCurrentUserData();
     }
 
     public void findViews() {
@@ -107,6 +105,7 @@ public class UserPageActivity extends AppCompatActivity {
             etEmail.append(email);
             etPassword.append(password);
         } else {
+            getCurrentUserData();
             etEmail.setText(firebaseAuth.getCurrentUser().getEmail());
             etDisplayname.setText(firebaseAuth.getCurrentUser().getDisplayName());
         }
@@ -160,7 +159,6 @@ public class UserPageActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE) {
             if (resultCode == RESULT_OK) {
-                uploadPicture(mFile);
                 showPictureTaken(mFile);
 
             } else if (resultCode == RESULT_CANCELED) {
@@ -289,9 +287,17 @@ public class UserPageActivity extends AppCompatActivity {
                 email = etEmail.getText().toString().trim(),
                 displayName = etDisplayname.getText().toString().trim()
         );
+        user.setImageId(currentUser.getImageId());
+        if(user.getDisplayName().equals("")) {
+            user.setDisplayName(currentUser.getDisplayName());
+        }
         FirebaseFirestore.getInstance().collection("users")
                 .document(FirebaseAuth.getInstance().getCurrentUser().getUid())
                 .set(user);
+
+        if(mFile != null) {
+            uploadPicture(mFile);
+        }
         Toast.makeText(getApplicationContext(), "Successfully updated account", Toast.LENGTH_SHORT).show();
         startActivity(new Intent(getApplicationContext(), ChatRoomActivity.class));
     }
@@ -306,7 +312,6 @@ public class UserPageActivity extends AppCompatActivity {
 
                         currentUserId = document.getId();
                         currentUser = new User(document.get("email").toString(),document.get("displayName").toString());
-
                         if(document.get("imageId") != null) {
                             currentUser.setImageId(document.get("imageId").toString());
 

@@ -56,7 +56,6 @@ public class ChatRoomActivity extends AppCompatActivity {
 
         messageList = new ArrayList<>();
         messageListAdapter = new MessageListAdapter(this, messageList);
-
         findViews();
 
         //readMessages();
@@ -65,6 +64,7 @@ public class ChatRoomActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
+        messageList.clear();
         firebaseFirestore.collection("messages").addSnapshotListener(this, new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
@@ -84,11 +84,14 @@ public class ChatRoomActivity extends AppCompatActivity {
                         DocumentSnapshot documentSnapshot = dc.getDocument();
                         Message m = documentSnapshot.toObject(Message.class);
                         messageList.add(m);
+                        
+                        //scroll to the bottom on new message
+                        rclViewMessage.smoothScrollToPosition(messageListAdapter.getItemCount() -1);
                     }
                     Collections.sort(messageList, new Comparator<Message>() {
                         @Override
                         public int compare(Message message1, Message message2) {
-                            return message2.getTime().compareTo(message1.getTime());
+                            return message1.getTime().compareTo(message2.getTime());
                         }
                     });
                     messageListAdapter.notifyDataSetChanged();
