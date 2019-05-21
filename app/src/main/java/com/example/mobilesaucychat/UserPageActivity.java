@@ -43,25 +43,19 @@ import java.util.Date;
 
 public class UserPageActivity extends AppCompatActivity {
 
-    private final static String LOGTAG = "Camtag";
-    private final static int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 100;
-    private static final int PHOTO_REQUEST_CODE = 1;
     private StorageReference mStorageRef;
-    private FirebaseDatabase database = FirebaseDatabase.getInstance();
-    FirebaseFirestore firebaseFirestore ;
-    private String path;
-    String currentUserId;
-    File mFile;
-    String email, password, displayName;
-    Toolbar mToolbar;
-    EditText etEmail, etDisplayname;
-    Button btnSave, btnLogout, btnDeleteUser;
-    ImageView imgFriend;
-    FirebaseAuth firebaseAuth;
-    Variables variables;
-    User currentUser;
+    private FirebaseFirestore firebaseFirestore;
+    private File mFile;
+    private String email, password, displayName;
+    private Toolbar mToolbar;
+    private EditText etEmail, etDisplayname;
+    private Button btnSave, btnLogout, btnDeleteUser;
+    private ImageView imgFriend;
+    private FirebaseAuth firebaseAuth;
+    private Variables variables;
+    private User currentUser;
 
-    private static final int REQUEST_TAKE_PHOTO = 1;
+    private final static int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 100;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -168,6 +162,9 @@ public class UserPageActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * open camera intent
+     */
     private void openCamera() {
         mFile = getOutputMediaFile(); // create a file to save the image
         if (mFile == null) {
@@ -178,13 +175,13 @@ public class UserPageActivity extends AppCompatActivity {
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(mFile));
 
-        Log.d(LOGTAG, "file uri = " + Uri.fromFile(mFile).toString());
+        Log.d(variables.LOGTAG, "file uri = " + Uri.fromFile(mFile).toString());
 
         if (intent.resolveActivity(getPackageManager()) != null) {
-            Log.d(LOGTAG, "camera app will be started");
+            Log.d(variables.LOGTAG, "camera app will be started");
             startActivityForResult(intent, CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE);
         } else
-            Log.d(LOGTAG, "camera app could NOT be started");
+            Log.d(variables.LOGTAG, "camera app could NOT be started");
     }
 
     /**
@@ -213,52 +210,69 @@ public class UserPageActivity extends AppCompatActivity {
         return mediaFile;
     }
 
+    /**
+     * upload user picture to the firebase storage
+     */
     public void uploadPicture(File newFile) {
         Uri file = Uri.fromFile(newFile);
+        //generate new id for the image
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
         String generatedId = database.getReference("users").push().getKey();
 
         StorageReference riversRef = mStorageRef.child("user-pictures/" + generatedId);
 
+        // create metadata for the image
         StorageMetadata metadata = new StorageMetadata.Builder()
                 .setCustomMetadata("originalName", newFile.getName())
-                .setCustomMetadata("userId", currentUserId)
+                .setCustomMetadata("userId", firebaseAuth.getCurrentUser().getUid())
                 .build();
 
-
+        // upload the image with metadata to the firestore
         riversRef.putFile(file,metadata)
                 .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                     @Override
                     public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                        // Get a URL to the uploaded content
-                         //Uri downloadUrl = taskSnapshot.getDownloadUrl();
-
-                        Log.d("xyz", "onSuccess: You just uploaded a picture to firestore");
+                        // Handle successful uploads
+                        Log.d(variables.LOGTAG, "onSuccess: You just uploaded a picture to firestore");
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception exception) {
                         // Handle unsuccessful uploads
-                        Log.d("xyz", "onFailure: Something went wrong...");
+                        Log.d(variables.LOGTAG, "onFailure: Something went wrong: " + exception);
                     }
                 });
     }
 
+    /**
+     * display taken picture
+     *
+     */
     private void showPictureTaken(File f) {
         imgFriend.setImageURI(Uri.fromFile(f));
     }
 
-    //remove user from auth0 and "users" db.
+    /**
+     * remove user from auth0 and "users" db
+     */
     private void deleteUser() {
+        // remove user from auth0
         firebaseAuth.getCurrentUser().delete();
-        FirebaseFirestore.getInstance().collection("users")
+
+        //remove user from db
+        firebaseFirestore.collection("users")
                 .document(FirebaseAuth.getInstance().getCurrentUser().getUid())
                 .delete();
         Toast.makeText(getApplicationContext(), "We're sad to see you leave...", Toast.LENGTH_SHORT).show();
         startActivity(new Intent(getApplicationContext(), MainActivity.class));
     }
 
+    /**
+     * create new user
+     */
     public void signUp() {
+        // add user to the auth
         firebaseAuth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                     @Override
@@ -268,7 +282,8 @@ public class UserPageActivity extends AppCompatActivity {
                                     email,
                                     displayName = etDisplayname.getText().toString().trim()
                             );
-                            FirebaseFirestore.getInstance().collection("users")
+                            //add user to the db
+                            firebaseFirestore.collection("users")
                                     .document(FirebaseAuth.getInstance().getCurrentUser().getUid())
                                     .set(user);
                             Toast.makeText(getApplicationContext(), "Successfully created account", Toast.LENGTH_SHORT).show();
@@ -280,26 +295,40 @@ public class UserPageActivity extends AppCompatActivity {
                 });
     }
 
+    /**
+     * Update current user
+     */
     public void updateUser() {
         User user = new User(
                 email = etEmail.getText().toString().trim(),
                 displayName = etDisplayname.getText().toString().trim()
         );
+        // get users current image
         user.setImageId(currentUser.getImageId());
+
+        // check if displayName was changed
         if(user.getDisplayName().equals("")) {
+            // get users displayName
             user.setDisplayName(currentUser.getDisplayName());
         }
-        FirebaseFirestore.getInstance().collection("users")
+
+        // update old user in the firebase
+        firebaseFirestore.collection("users")
                 .document(FirebaseAuth.getInstance().getCurrentUser().getUid())
                 .set(user);
 
+        // check if users image was changed
         if(mFile != null) {
+            // change users profile picture
             uploadPicture(mFile);
         }
         Toast.makeText(getApplicationContext(), "Successfully updated account", Toast.LENGTH_SHORT).show();
         startActivity(new Intent(getApplicationContext(), ChatRoomActivity.class));
     }
 
+    /**
+     * get users data from database
+     */
     private void getCurrentUserData() {
         String email = firebaseAuth.getCurrentUser().getEmail();
         firebaseFirestore.collection("users").whereEqualTo("email",email).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -308,33 +337,40 @@ public class UserPageActivity extends AppCompatActivity {
                 if (task.isSuccessful()) {
                     for (QueryDocumentSnapshot document : task.getResult()) {
 
-                        currentUserId = document.getId();
+                        Log.d(variables.LOGTAG, "isSuccessful: You received user information");
+
                         currentUser = new User(document.get("email").toString(),document.get("displayName").toString());
+
+                        //if user has image
                         if(document.get("imageId") != null) {
                             currentUser.setImageId(document.get("imageId").toString());
-
                             //display users image
                             displayUsersImage();
                         }
                     }
                 } else {
-                    Log.d("TAG", "Error getting documents: ", task.getException());
+                    Log.d(variables.LOGTAG, "Error getting documents: ", task.getException());
                 }
             }
         });
     }
 
+    /**
+     * display profile picture
+     */
     private void displayUsersImage() {
         mStorageRef.child("user-pictures/"+ currentUser.getImageId()).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
             @Override
             public void onSuccess(Uri uri) {
+                Log.d(variables.LOGTAG, "onSuccess: You got a picture from firestore");
+
+                //display image on imageView
                 Glide.with(getApplicationContext()).load(uri).into(imgFriend);
-                // Got the download URL'
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception exception) {
-                Log.d("ERROR", "" + exception);
+                Log.d(variables.LOGTAG, "onFailure: Something went wrong: " + exception);
             }
         });
     }

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -26,9 +27,18 @@
             android:id="@+id/etSend"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_toStartOf="@id/imgBtnSend"
+            android:layout_alignParentLeft="true"
+            android:layout_marginEnd="11dp"
+            android:layout_toStartOf="@+id/imgBtnGallery"
             android:hint="@string/saucychatting" />
+
+        <ImageButton
+            android:id="@+id/imgBtnGallery"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginEnd="11dp"
+            android:layout_toStartOf="@+id/imgBtnSend"
+            android:background="@drawable/ic_action_image" />
 
         <ImageButton
             android:id="@+id/imgBtnSend"

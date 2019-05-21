@@ -17,9 +17,9 @@ import com.google.firebase.auth.FirebaseAuth;
 
 public class MainActivity extends AppCompatActivity {
 
-    EditText etEmail, etPassword;
-    FirebaseAuth firebaseAuth;
-    Variables variables;
+    private EditText etEmail, etPassword;
+    private FirebaseAuth firebaseAuth;
+    private Variables variables;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

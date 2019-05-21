@@ -7,10 +7,12 @@ public class Variables {
     public String EMAIL_INFO;
     public String PASSWORD_INFO;
     public int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE;
+    public static String LOGTAG;
     public static String PICTURE_URI;
 
     private Variables()
     {
+        LOGTAG = "LOGTAG";
         EMAIL_INFO = "EmailInfo";
         PASSWORD_INFO = "PasswordInfo";
         CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 100;

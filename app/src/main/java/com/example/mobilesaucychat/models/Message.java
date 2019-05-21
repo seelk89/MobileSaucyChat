@@ -12,12 +12,10 @@ public class Message {
     public Message(
             String userId,
             String text,
-            //String imageId,
             Timestamp time
     ) {
         this.userId = userId;
         this.text = text;
-        //this.imageId = imageId;
         this.time = time;
     }
 
