@@ -9,6 +9,7 @@ import android.os.StrictMode;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.IntentCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -257,15 +258,23 @@ public class UserPageActivity extends AppCompatActivity {
      * remove user from auth0 and "users" db
      */
     private void deleteUser() {
-        // remove user from auth0
-        firebaseAuth.getCurrentUser().delete();
-
         //remove user from db
         firebaseFirestore.collection("users")
                 .document(FirebaseAuth.getInstance().getCurrentUser().getUid())
                 .delete();
         Toast.makeText(getApplicationContext(), "We're sad to see you leave...", Toast.LENGTH_SHORT).show();
-        startActivity(new Intent(getApplicationContext(), MainActivity.class));
+
+        // remove user from auth0
+
+        firebaseAuth.getCurrentUser().delete();
+        firebaseAuth.signOut();
+
+        //close previous activities and open main
+        Intent intents = new Intent(getApplicationContext(), MainActivity.class);
+        intents.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK
+                | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(intents);
+        finish();
     }
 
     /**

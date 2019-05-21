@@ -157,7 +157,13 @@ public class ChatRoomActivity extends AppCompatActivity {
         if (id == R.id.itemLogout) {
             firebaseAuth.signOut();
             Toast.makeText(getApplicationContext(), "You have signed out", Toast.LENGTH_SHORT).show();
-            startActivity(new Intent(getApplicationContext(), MainActivity.class));
+
+            //close previous activities and open main
+            Intent intents = new Intent(getApplicationContext(), MainActivity.class);
+            intents.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK
+                    | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(intents);
+            finish();
         }
         return super.onOptionsItemSelected(item);
     }
@@ -239,14 +245,6 @@ public class ChatRoomActivity extends AppCompatActivity {
                 .setCustomMetadata("userId", userId)
                 .build();
 
-        /*Bitmap bm = BitmapFactory.decodeFile(newFile.getPath());
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        bm.compress(Bitmap.CompressFormat.JPEG, 100, baos); //bm is the bitmap object
-        byte[] b = baos.toByteArray();
-
-        String encodedImage = Base64.encodeToString(b, Base64.DEFAULT);*/
-
-        // send image to the firestore
         riversRef.putFile(pictureUri,metadata)
                 .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                     @Override
