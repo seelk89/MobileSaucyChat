@@ -88,8 +88,8 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
             displayMessageImage(message.getImageId(),messageListRow.messageImage);
         } else {
             //hide imageView
-            messageListRow.messageImage.getLayoutParams().width = 100;
-            messageListRow.messageImage.getLayoutParams().height = 100;
+            messageListRow.messageImage.getLayoutParams().width = 0;
+            messageListRow.messageImage.getLayoutParams().height = 0;
             messageListRow.messageImage.requestLayout();
         }
         //display profile picture

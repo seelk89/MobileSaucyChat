@@ -100,7 +100,7 @@ public class UserPageActivity extends AppCompatActivity {
         } else {
             getCurrentUserData();
             etEmail.setText(firebaseAuth.getCurrentUser().getEmail());
-            etDisplayname.setText(firebaseAuth.getCurrentUser().getDisplayName());
+           // etDisplayname.setText(firebaseAuth.getCurrentUser().getDisplayName());
         }
         if (firebaseAuth.getCurrentUser() == null) {
             btnLogout.setVisibility(View.GONE);
@@ -296,7 +296,19 @@ public class UserPageActivity extends AppCompatActivity {
                                     .document(FirebaseAuth.getInstance().getCurrentUser().getUid())
                                     .set(user);
                             Toast.makeText(getApplicationContext(), "Successfully created account", Toast.LENGTH_SHORT).show();
-                            startActivity(new Intent(getApplicationContext(), ChatRoomActivity.class));
+
+                            // check if users image was changed
+                            if(mFile != null) {
+                                // change users profile picture
+                                uploadPicture(mFile);
+                            }
+
+                            // close previous activity and open chatRoom
+                            Intent intents = new Intent(getApplicationContext(), ChatRoomActivity.class);
+                            intents.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK
+                                    | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                            startActivity(intents);
+                            finish();
                         } else {
                             Toast.makeText(getApplicationContext(), "Something is wrong", Toast.LENGTH_SHORT).show();
                         }
@@ -312,8 +324,11 @@ public class UserPageActivity extends AppCompatActivity {
                 email = etEmail.getText().toString().trim(),
                 displayName = etDisplayname.getText().toString().trim()
         );
+        Log.d("TAG", "" + currentUser);
         // get users current image
-        user.setImageId(currentUser.getImageId());
+        if(!currentUser.getImageId().equals("")) {
+            user.setImageId(currentUser.getImageId());
+        }
 
         // check if displayName was changed
         if(user.getDisplayName().equals("")) {
@@ -350,11 +365,17 @@ public class UserPageActivity extends AppCompatActivity {
 
                         currentUser = new User(document.get("email").toString(),document.get("displayName").toString());
 
+                        //if user has display name
+                        if(document.get("displayName") != null) {
+                            etDisplayname.setText(document.get("displayName").toString());
+                        }
                         //if user has image
                         if(document.get("imageId") != null) {
                             currentUser.setImageId(document.get("imageId").toString());
                             //display users image
                             displayUsersImage();
+                        } else {
+                            currentUser.setImageId("");
                         }
                     }
                 } else {

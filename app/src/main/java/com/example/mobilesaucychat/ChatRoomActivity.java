@@ -104,7 +104,7 @@ public class ChatRoomActivity extends AppCompatActivity {
                         messageList.add(m);
 
                         //scroll to the bottom on new message
-                        rclViewMessage.smoothScrollToPosition(messageListAdapter.getItemCount() -1);
+                        rclViewMessage.scrollToPosition(messageListAdapter.getItemCount() -1);
                     }
                     // sort messages in the list
                     Collections.sort(messageList, new Comparator<Message>() {
@@ -196,8 +196,11 @@ public class ChatRoomActivity extends AppCompatActivity {
         imgBtnSend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                rclViewMessage.scrollToPosition(messageListAdapter.getItemCount() - 1);
                 String text = etSend.getText().toString().trim();
 
+
+                if(text.length() > 0 ) {
                 //create new message
                 final Message message = new Message(
                         firebaseAuth.getCurrentUser().getUid(),
@@ -221,6 +224,10 @@ public class ChatRoomActivity extends AppCompatActivity {
                         });
                 etSend.setText("");
             }
+                else {
+                    Toast.makeText(ChatRoomActivity.this, "Cannot send empty message", Toast.LENGTH_SHORT).show();
+                }
+        }
         });
     }
 

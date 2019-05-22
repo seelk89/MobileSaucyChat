@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">MobileSaucyChat</string>
+    <string name="app_name">SaucyChat</string>
     <string name="logOut">Log Out</string>
     <string name="save">Save</string>
     <string name="username">Email</string>
