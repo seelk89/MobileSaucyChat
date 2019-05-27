@@ -361,7 +361,12 @@ public class UserPageActivity extends AppCompatActivity {
 
                         Log.d(variables.LOGTAG, "isSuccessful: You received user information");
 
-                        currentUser = new User(document.get("email").toString(),document.get("displayName").toString());
+                        //check for displayName
+                        if(document.get("displayName") != null) {
+                            currentUser = new User(document.get("email").toString(),document.get("displayName").toString());
+                        } else  {
+                            currentUser = new User(document.get("email").toString(),"");
+                        }
 
                         //if user has display name
                         if(document.get("displayName") != null) {
