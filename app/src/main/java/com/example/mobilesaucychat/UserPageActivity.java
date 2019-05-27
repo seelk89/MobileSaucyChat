@@ -9,7 +9,6 @@ import android.os.StrictMode;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.IntentCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -100,7 +99,6 @@ public class UserPageActivity extends AppCompatActivity {
         } else {
             getCurrentUserData();
             etEmail.setText(firebaseAuth.getCurrentUser().getEmail());
-           // etDisplayname.setText(firebaseAuth.getCurrentUser().getDisplayName());
         }
         if (firebaseAuth.getCurrentUser() == null) {
             btnLogout.setVisibility(View.GONE);
